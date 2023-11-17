@@ -1,0 +1,61 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Paper Generator</title>
+</head>
+<body>
+  <h1>Question Paper Generator</h1>
+  <form id="generateForm">
+    <label for="totalMarks">Total Marks:</label>
+    <input type="number" id="totalMarks" name="totalMarks" required>
+    
+    <label for="easyPercentage">Easy Percentage:</label>
+    <input type="number" id="easyPercentage" name="easyPercentage" required>
+    
+    <label for="mediumPercentage">Medium Percentage:</label>
+    <input type="number" id="mediumPercentage" name="mediumPercentage" required>
+    
+    <label for="hardPercentage">Hard Percentage:</label>
+    <input type="number" id="hardPercentage" name="hardPercentage" required>
+
+    <button type="button" onclick="generatePaper()">Generate Question Paper</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    function generatePaper() {
+      const totalMarks = document.getElementById('totalMarks').value;
+      const easyPercentage = document.getElementById('easyPercentage').value;
+      const mediumPercentage = document.getElementById('mediumPercentage').value;
+      const hardPercentage = document.getElementById('hardPercentage').value;
+
+      fetch('/generate-paper', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          totalMarks,
+          difficultyDistribution: {
+            Easy: easyPercentage,
+            Medium: mediumPercentage,
+            Hard: hardPercentage,
+          },
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<h2>Generated Question Paper:</h2>';
+        data.questionPaper.forEach((question, index) => {
+          resultDiv.innerHTML += `<p>${index + 1}. ${question.question} (${question.difficulty}, ${question.marks} marks)</p>`;
+        });
+      });
+    }
+  </script>
+</body>
+</html>
